@@ -99,7 +99,7 @@ class binpacking_posco_v0(gym.Env):
             self.map_action(action)
             self.ct += 1
             self.update_product()
-            reward = 0
+            reward = 1 # 물리적으로 올바른 행동을 했을 때 기본점수
         else:
             reward = self.calc_reward()
             
@@ -123,7 +123,7 @@ class binpacking_posco_v0(gym.Env):
         if score > self.threshold:
             return 100*score
         else:
-            return score
+            return score*5 # 행동이 끝났을 때 점수
         
     def render(self, action, reward, mode='human'):
         if mode == 'human':

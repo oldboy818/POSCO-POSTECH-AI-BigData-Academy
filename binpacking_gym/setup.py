@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(
-    name="Box2D-posco"
+    name="binpacking_posco"
     version="1.0"
     install_requires=['gym']
 )
