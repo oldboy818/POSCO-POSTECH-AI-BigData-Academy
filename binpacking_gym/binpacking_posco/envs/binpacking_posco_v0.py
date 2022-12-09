@@ -114,6 +114,7 @@ class binpacking_posco_v0(gym.Env):
         self.width = self.products[self.ct][0]
         self.length = self.products[self.ct][1]
         # 매번 다른 state를 주고 학습 시킬 수 있음 !
+        # Reset 시에 Map을 Sampling 하게 하면 매번 다른 환경에서 학습하게 할 수 있음.
         self.state = np.append(self.Map.flatten(), self.width)
         
         # Map of warehouse
