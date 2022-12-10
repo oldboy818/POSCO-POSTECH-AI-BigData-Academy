@@ -19,10 +19,14 @@ class binpacking_posco_v0(gym.Env):
     Reward = [0 - 100]
     """
     # Class Variables 
-    products = [(4, 4), (2, 2), (3, 3), (1, 1), (2, 2), (3, 3), (4, 4), (1, 1), (2, 2), (1, 1),
-                (4, 4), (2, 2), (3, 3), (1, 1), (2, 2), (3, 3), (4, 4), (1, 1), (2, 2), (1, 1),
-                (4, 4), (2, 2), (3, 3), (1, 1), (2, 2), (3, 3), (4, 4), (1, 1), (2, 2), (1, 1)]
-    reward_range = (0, 100)
+    products = [(4,4), (2,2), (2,2), (4,4), (3,3), (3,3), (2,2), (2,2), (1,1), (1,1), (1,1), (3,3), (2,2), (2,2), (2,2)]
+        
+        # (4, 4), (2, 2), (3, 3), (1, 1), (2, 2), (4, 4), 
+                
+        #         (1, 1), (2, 2), (1, 1),
+        #         (4, 4), (2, 2), (3, 3), (1, 1), (2, 2), (3, 3), (4, 4), (1, 1), (2, 2), (1, 1),
+        #         (4, 4), (2, 2), (3, 3), (1, 1), (2, 2), (3, 3), (4, 4), (1, 1), (2, 2), (1, 1)]
+    # reward_range = (0, 100)
     metadata = {'mode': ['human']}
     spec = "EnvSpec"
     
@@ -50,7 +54,7 @@ class binpacking_posco_v0(gym.Env):
         low = np.array([0 for _ in range(len(self.actions_grid))] + [0])
         high = np.array([1 for _ in range(len(self.actions_grid))] + [4])
         self.observation_space = spaces.Box(low, high, dtype=int)
-        self.threshold = 0.6 # 이 비율의 공간을 채웠을 때 더 많은 리워드를 줌
+        self.threshold = 0.5 # 이 비율의 공간을 채웠을 때 더 많은 리워드를 줌
     
     def update_product(self):
         self.width = self.products[self.ct][0]
@@ -93,7 +97,8 @@ class binpacking_posco_v0(gym.Env):
         action = self.int_action_to_grid(action)
 
         terminated = bool(
-            self.ct2 == 30
+            self.ct2 == 70
+            or self.ct == 14
         )
 
         if not terminated: # 내려두지 않아야함 terminated이 True 일 때..
@@ -124,6 +129,8 @@ class binpacking_posco_v0(gym.Env):
     
     def calc_reward(self):
         score = self.Map.sum() / (self.Map.shape[0] * self.Map.shape[1])
+        if score >= 0.95:
+            return 200*score
         if score > self.threshold:
             return 100*score
         else:
