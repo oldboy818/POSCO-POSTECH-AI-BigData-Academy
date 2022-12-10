@@ -4,55 +4,55 @@ from gym import spaces
 from random import choice
 from copy import copy
 """
-Loop를 통해 겹쳐지는 물건의 수를 제거하는 버전
-= 일정 수 이상 수를 못찾으면 종료되는 것으로.
-
-For stable-baseline,
-No masking
-When agent pick unavailable action, resample with While Loop.
+Model 학습단계에서 Loop를 사용하여 외부적으로 상황을 종료하는 환경.
 """
 
 class binpacking_posco_v0(gym.Env):
     """
     Custom Env for 2D-bin Packing
-    
-    Reward = [0 - 100]
     """
     # Class Variables 
-    products = [(4, 4), (2, 2), (3, 3), (1, 1), (2, 2), (3, 3), (4, 4), (1, 1), (2, 2), (1, 1),
-                (4, 4), (2, 2), (3, 3), (1, 1), (2, 2), (3, 3), (4, 4), (1, 1), (2, 2), (1, 1),
-                (4, 4), (2, 2), (3, 3), (1, 1), (2, 2), (3, 3), (4, 4), (1, 1), (2, 2), (1, 1)]
-    reward_range = (0, 100)
+    products = [(1,1), (2,2), (3,3), (3,3), (2,2), (2,2), (1,1),
+                (1,1), (2,2), (3,3), (3,3), (2,2), (2,2), (1,1),
+                (1,1), (2,2), (3,3), (3,3), (2,2), (2,2), (1,1),
+                (1,1), (2,2), (3,3), (3,3), (2,2), (2,2), (1,1)]
+    #products_list = [products[2], products[2], products[1]]
+    
+    # reward_range = (0, 100)
     metadata = {'mode': ['human']}
     spec = "EnvSpec"
     
     
-    def __init__(self):
+    def __init__(self, **kwargs):
         super(binpacking_posco_v0, self).__init__()
-        # Product's Size
-        # 여기서는 애초에 ㄱ자, ㄴ자 정의가 안됨
+        # For ending of episode
         self.ct = 0 # index of products
+        self.ct2 = 0
+        self.ct2_threshold = kwargs.get('ct2_threshold', 50) # 불가능한 행동의 제한 수
+        
+        # Product's Size
         self.width = self.products[self.ct][0]
         self.length = self.products[self.ct][1]
-        self.ct2 = 0
+        
         # Map of warehouse
-        self.Map = np.zeros([10, 10], dtype=int)
-        self.max_x = self.Map.shape[0]-1
-        self.max_y = self.Map.shape[1]-1
+        self.mapsize = kwargs.get('mapsize', [10, 10])
+        self.Map = np.zeros(self.mapsize, dtype=int)
+        self.max_x = self.mapsize[0]-1
+        self.max_y = self.mapsize[1]-1
+        
         self.state = None
-        
         self.actions_grid = [[i, j] for j in range (self.max_x+1) for i in range(self.max_y+1)]
-        #self.action_index = [i for i in range(len(self.actions_grid))] # Action's Index
         self.action_space = spaces.Discrete(len(self.actions_grid))
-        #self.action_space = spaces.MultiDiscrete([10, 10])
+        self.print_Map = kwargs.get('print_Map', True)
         
-        # Width == Length
-        low = np.array([0 for _ in range(len(self.actions_grid))] + [0])
+        # Observation space
+        ## Map + Max box size
+        low = np.array([0 for _ in range(len(self.actions_grid))] + [0]) 
         high = np.array([1 for _ in range(len(self.actions_grid))] + [4])
         self.observation_space = spaces.Box(low, high, dtype=int)
-        self.threshold = 0.6 # 이 비율의 공간을 채웠을 때 더 많은 리워드를 줌
+        self.threshold = kwargs.get('threshold', 0.6) # Default = 0.6 # 이 비율의 공간을 채웠을 때 더 많은 리워드를 줌
     
-    def update_product(self):
+    def update_product(self): # get next product
         self.width = self.products[self.ct][0]
         self.length = self.products[self.ct][1]
 
@@ -62,10 +62,8 @@ class binpacking_posco_v0(gym.Env):
     def available_act(self, action):
         """
         선택한 Action이 시행 가능한지 확인
-        """
-        action = self.int_action_to_grid(action)
-        
-        self.ct2 += 1
+        """        
+        self.ct2 += 1 # count unavailable action
         if action[0] + self.length > self.max_x:
             return False
         if action[1] + self.width > self.max_y:
@@ -80,11 +78,7 @@ class binpacking_posco_v0(gym.Env):
 
     def map_action(self, action):
         """
-        Randomly sample ACT with available act list.
-        
-        Actions of Map
-        1. Change Map (Drop product)
-        2. Change action_space
+        물건을 내려놓고 Map을 0 -> 1로 변경
         """        
         # Drop product (Only for Square) / Fill the Map
         self.Map[action[0]:(action[0] + self.length), action[1]:(action[1] + self.width)] = 1
@@ -93,7 +87,8 @@ class binpacking_posco_v0(gym.Env):
         action = self.int_action_to_grid(action)
 
         terminated = bool(
-            self.ct2 == 30
+            self.ct2 == self.ct2_threshold
+            or self.ct == 20
         )
 
         if not terminated: # 내려두지 않아야함 terminated이 True 일 때..
@@ -117,12 +112,15 @@ class binpacking_posco_v0(gym.Env):
         self.state = np.append(self.Map.flatten(), self.width)
         
         # Map of warehouse
-        self.Map = np.zeros([10, 10], dtype=int)
+        self.Map = np.zeros(self.mapsize, dtype=int)
         
         return np.array(self.state)
     
     def calc_reward(self):
-        score = self.Map.sum() / (self.Map.shape[0] * self.Map.shape[1])
+        """
+        Reward when ending of episode        
+        """
+        score = self.Map.sum() / (self.mapsize[0] * self.mapsize[1]) # Episode 후 남아있는 공간
         if score > self.threshold:
             return 100*score
         else:
@@ -131,7 +129,8 @@ class binpacking_posco_v0(gym.Env):
     def render(self, action, reward, mode='human'):
         if mode == 'human':
             print (f'Action :{action}, reward :{reward}, box :{self.products[self.ct-1]}')
-            print (self.Map)
+            if self.print_Map:
+                print (self.Map)
     
     def close(self):
         pass

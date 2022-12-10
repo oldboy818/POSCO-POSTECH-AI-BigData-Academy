@@ -5,6 +5,10 @@ From 2022-12-06
 ## Gym Env
 
 Custom gym Environment name as `binpacking_posco`
+```text
+v0 : End the episode with external parameter for action masking
+v1 : No action masking, If AI take impossible action get minus reward.
+```
 
 ## Usage
 
