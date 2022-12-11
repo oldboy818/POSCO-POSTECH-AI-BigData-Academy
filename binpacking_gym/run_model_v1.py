@@ -14,6 +14,9 @@ EPISODES = 2000
 
 # 카트폴 예제에서의 DQN 에이전트
 class DQNAgent:
+    model_save_path = './v2_model_2000.h5'
+    model_load_path = './change_max_model.h5'
+    
     def __init__(self, state_size, action_size):
         self.render = False
         self.load_model = False
@@ -23,13 +26,13 @@ class DQNAgent:
         self.action_size = action_size
 
         # DQN 하이퍼파라미터
-        self.discount_factor = 0.99
-        self.learning_rate = 0.001
+        self.discount_factor = 0.99 # 먼지모름..
+        self.learning_rate = 0.01
         self.epsilon = 1.0
-        self.epsilon_decay = 0.999
-        self.epsilon_min = 0.01
-        self.batch_size = 64
-        self.train_start = 64
+        self.epsilon_decay = 0.999 # 뒤로갈수록 epsilon을 적용하여 가중치가 줄어듬
+        self.epsilon_min = 0.3 # 최종적으로 어디까지 떨어질 것인가.
+        self.batch_size = 32
+        self.train_start = 32
 
         # 리플레이 메모리, 최대 크기 2000
         self.memory = deque(maxlen=2000)
@@ -41,8 +44,8 @@ class DQNAgent:
         # 타깃 모델 초기화
         self.update_target_model()
 
-        # if self.load_model:
-            # self.model.load_weights("./save_model/cartpole_dqn_trained.h5")
+        if self.load_model:
+            self.model.load_weights("./binpacking_model1.h5")
 
     # 상태가 입력, 큐함수가 출력인 인공신경망 생성
     def build_model(self):
@@ -110,7 +113,7 @@ class DQNAgent:
 
 
 if __name__ == "__main__":
-    env = gym.make('binpacking_posco-v1', print_Map=False, ct2_threshold=20)
+    env = gym.make('binpacking_posco-v2', print_Map=True, ct2_threshold=20, threshold=0.7)
     state_size = env.observation_space.shape[0]
     action_size = env.action_space.n
 
@@ -149,6 +152,7 @@ if __name__ == "__main__":
             if done:
                 # 각 에피소드마다 타깃 모델을 모델의 가중치로 업데이트
                 agent.update_target_model()
+                score += env.ct2_threshold
                 scores.append(score)
                 episodes.append(e)
                 # pylab.plot(episodes, scores, 'b')
@@ -156,16 +160,14 @@ if __name__ == "__main__":
                 # plt.plot(episodes, scores, 'b')
                 # plt.savefig('savefig_default.png')
                 print("episode:", e, "  score:", score, "  memory length:",
-                      len(agent.memory), "  epsilon:", agent.epsilon)
+                      len(agent.memory), "  epsilon:", agent.epsilon, "info :", info)
 
-                # 이전 10개 에피소드의 점수 평균이 490보다 크면 학습 중단
-                if np.mean(scores[-min(10, len(scores)):]) > thres+5:
-                    if env.threshold == 0.9:
-                        pass
-                    else:
-                        env.threshold += 0.1
-                        thres += 10
-                elif np.mean(scores[-min(10, len(scores)):]) > 200:
-                    agent.model.save_weights("./save_model/cartpole_dqn.h5")
+                if np.mean(scores[-min(10, len(scores)):]) > 100: # 연속 10번 100점을 넘긴다면.
+                    agent.model.save_weights(agent.model_save_path)
                     sys.exit()
-    #agent.model.save_weights("./save_model/cartpole_dqn.h5")
+    agent.model.save_weights(agent.model_save_path)
+    
+# Threshold를 러닝하면서 계속 올리는게 아니라
+# 끊어서 Weight를 기록한 후 threshold를 올려서 다시 돌려야함.
+# => 중간에 올리면 이전의 score랑 충돌한다.
+# 모델은 score를 안받으니까 이게 맞는듯

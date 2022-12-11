@@ -11,3 +11,8 @@ register(
         id='binpacking_posco-v1',
         entry_point='binpacking_posco.envs:binpacking_posco_v1',
 )
+
+register(
+        id='binpacking_posco-v2',
+        entry_point='binpacking_posco.envs:binpacking_posco_v2',
+)

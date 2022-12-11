@@ -1,2 +1,3 @@
 from .binpacking_posco_v0 import binpacking_posco_v0
 from .binpacking_posco_v1 import binpacking_posco_v1
+from .binpacking_posco_v2 import binpacking_posco_v2

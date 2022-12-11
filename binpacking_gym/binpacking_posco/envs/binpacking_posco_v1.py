@@ -25,16 +25,18 @@ class binpacking_posco_v1(binpacking_posco_v0):
         )
         
         if not terminated:
+            info = {}
             if self.available_act(action):
                 self.map_action(action)
                 self.ct += 1
                 self.update_product()
                 self.state = np.append(self.Map.flatten(), self.width)
-                reward = 1
+                reward = 5
                 self.ct2 = 0
             else:
                 reward = -1
         else:
-            reward = self.calc_reward()
+            reward, score = self.calc_reward()
+            info = {score}
     
-        return self.state, reward, terminated, {}
+        return self.state, reward, terminated, info
