@@ -1,21 +1,20 @@
 import sys
 sys.path.append('./binpacking_posco/envs/')
+import numpy as np
+
 from binpacking_posco_v0 import binpacking_posco_v0
-"""
-Product List 가 정해진 버전
-"""
 
 class binpacking_posco_v1(binpacking_posco_v0):
+    # 22개
     products = [(3,3), (3,3), (3,3), (1,1), (1,1), (1,1),
                 (3,3), (3,3), (3,3), (1,1), (1,1), (1,1),
                 (2,2), (2,2), (2,2), (2,2), (2,2),
                 (2,2), (2,2), (2,2), (2,2), (2,2)]
     """
-    Version 1
-    V0 의 모든 함수를 따라감.
+    version 1
     
+    v0 의 모든 함수를 따라감.
     변경부분만 아래에 적어 두었음.
-    
     물리적으로 불가능한 액션 시행시 -1점을 받고 내부적으로 기록하도록.
     """
     def __init__(self, **kwargs):
@@ -38,9 +37,8 @@ class binpacking_posco_v1(binpacking_posco_v0):
             self.ct2 == self.ct2_threshold
             or self.filled_map > 80 # 80% 이상
         )
-        
+        score = 0
         if not terminated:
-            info = {'score' : 0}
             if self.available_act(action):
                 self.map_action(action)
                 self.update_product()
@@ -50,12 +48,9 @@ class binpacking_posco_v1(binpacking_posco_v0):
             else:
                 reward = -1
         else:
-            reward, score = self.calc_reward()
-            reward = 1
-            info = {'score' : score}
+            reward = -1
+        info = {'score' : score}
         
-        return self.state, reward, terminated, info
-    
         return self.state, reward, terminated, info
     
     def reset(self):

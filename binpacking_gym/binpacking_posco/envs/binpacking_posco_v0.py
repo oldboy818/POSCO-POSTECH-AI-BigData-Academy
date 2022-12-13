@@ -28,10 +28,9 @@ class binpacking_posco_v0(gym.Env):
         Kwargs / Default value (type)
         -------------
         ct2_threshold : 불가능한 행동을 몇번까지 허용할 것인가 / 50 (int)
-        threshold 몇 %의 맵을 채웠을때 추가점수를 줄 것인가. : / 0.6 (float)
+        # threshold 몇 %의 맵을 채웠을때 추가점수를 줄 것인가. : / 0.6 (float)
         mapsize : 전체 맵 사이즈 / [10, 10] (list)
         print_Map : Action시 마다 Map 출력 / True (bool)
-        random_product : Product를 random으로 쓸 것인가 ? / False (bool)
         """
         super(binpacking_posco_v0, self).__init__()
         # Params
