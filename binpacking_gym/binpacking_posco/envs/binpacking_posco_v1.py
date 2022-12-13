@@ -1,10 +1,15 @@
 import sys
 sys.path.append('./binpacking_posco/envs/')
-import numpy as np
-
 from binpacking_posco_v0 import binpacking_posco_v0
+"""
+Product List 가 정해진 버전
+"""
 
 class binpacking_posco_v1(binpacking_posco_v0):
+    products = [(3,3), (3,3), (3,3), (1,1), (1,1), (1,1),
+                (3,3), (3,3), (3,3), (1,1), (1,1), (1,1),
+                (2,2), (2,2), (2,2), (2,2), (2,2),
+                (2,2), (2,2), (2,2), (2,2), (2,2)]
     """
     Version 1
     V0 의 모든 함수를 따라감.
@@ -15,28 +20,56 @@ class binpacking_posco_v1(binpacking_posco_v0):
     """
     def __init__(self, **kwargs):
         super(binpacking_posco_v1, self).__init__(**kwargs)
+        self.prod_idx = 0 # 랜덤이 아닐 때 product index
         
+        self.width = self.products[self.prod_idx][0]
+        self.length = self.products[self.prod_idx][1]
+    
+    def update_product(self): # get next product
+        self.prod_idx += 1
+        self.width = self.products[self.prod_idx][0]
+        self.length = self.products[self.prod_idx][1]
+        self.filled_map += self.width*self.length
+
     def step(self, action):
         action = self.int_action_to_grid(action)
         
         terminated = bool(
             self.ct2 == self.ct2_threshold
-            or self.ct == 20
+            or self.filled_map > 80 # 80% 이상
         )
         
         if not terminated:
-            info = {}
+            info = {'score' : 0}
             if self.available_act(action):
                 self.map_action(action)
-                self.ct += 1
                 self.update_product()
                 self.state = np.append(self.Map.flatten(), self.width)
-                reward = 5
+                reward = 1
                 self.ct2 = 0
             else:
                 reward = -1
         else:
             reward, score = self.calc_reward()
-            info = {score}
+            reward = 1
+            info = {'score' : score}
+        
+        return self.state, reward, terminated, info
     
         return self.state, reward, terminated, info
+    
+    def reset(self):
+        self.ct2 = 0
+        self.filled_map = 0
+        
+        self.prod_idx = 0
+        self.width = self.products[self.prod_idx][0]
+        self.length = self.products[self.prod_idx][1]
+        
+        # 매번 다른 state를 주고 학습 시킬 수 있음 !
+        self.state = np.append(self.Map.flatten(), self.width)
+        
+        # Map of warehouse
+        self.Map = np.zeros(self.mapsize, dtype=int)
+        
+        return np.array(self.state)

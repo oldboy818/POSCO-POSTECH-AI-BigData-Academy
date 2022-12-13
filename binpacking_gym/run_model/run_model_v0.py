@@ -10,7 +10,7 @@ from tensorflow.keras.optimizers import Adam
 from keras.models import Sequential
 import binpacking_posco
 
-EPISODES = 150
+EPISODES = 200
 
 # 카트폴 예제에서의 DQN 에이전트
 class DQNAgent:

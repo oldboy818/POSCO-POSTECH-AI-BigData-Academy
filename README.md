@@ -8,7 +8,7 @@ Custom gym Environment name as `binpacking_posco`
 ```text
 v0 : End the episode with external parameter for action masking
 v1 : No action masking, If AI take impossible action get minus reward.
-v2 : Random Products.
+v2 : Random Products. - reward = -1 or 1 / 물리적으로 가능한 동작을 하게하려고
 v3 : Action Masking by the Rule, The model should take possible action!.
 v4 : Stable baseline
 ```

@@ -113,7 +113,7 @@ class DQNAgent:
 
 
 if __name__ == "__main__":
-    env = gym.make('binpacking_posco-v2', print_Map=True, ct2_threshold=20, threshold=0.7)
+    env = gym.make('binpacking_posco-v2', print_Map=True, ct2_threshold=20)
     state_size = env.observation_space.shape[0]
     action_size = env.action_space.n
 
@@ -122,7 +122,7 @@ if __name__ == "__main__":
 
     scores, episodes = [], []
     thres = 50
-
+            
     for e in range(EPISODES):
         done = False
         score = 0
@@ -142,6 +142,7 @@ if __name__ == "__main__":
 
             # 리플레이 메모리에 샘플 <s, a, r, s'> 저장
             agent.append_sample(state, action, reward, next_state, done)
+                
             # 매 타임스텝마다 학습
             if len(agent.memory) >= agent.train_start: # train_start 이후부터 학습 시작
                 agent.train_model()
@@ -162,7 +163,7 @@ if __name__ == "__main__":
                 print("episode:", e, "  score:", score, "  memory length:",
                       len(agent.memory), "  epsilon:", agent.epsilon, "info :", info)
 
-                if np.mean(scores[-min(10, len(scores)):]) > 100: # 연속 10번 100점을 넘긴다면.
+                if np.mean(scores[-min(10, len(scores)):]) > 200: # 연속 10번 100점을 넘긴다면.
                     agent.model.save_weights(agent.model_save_path)
                     sys.exit()
     agent.model.save_weights(agent.model_save_path)
