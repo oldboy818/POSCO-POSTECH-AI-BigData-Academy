@@ -161,8 +161,8 @@ class binpacking_posco_v0(gym.Env):
         # Map에서 1인 부분 찾아 tuple의 list로 저장
         Map = list(map(list, self.Map))
         boxes = []
-        for i in range(10) :
-            for j in range(10):
+        for i in range(self.mapsize[0]) :
+            for j in range(self.mapsize[1]):
                 if Map[i][j] == 1:
                     boxes.append((i, j, 1, 1))
 
