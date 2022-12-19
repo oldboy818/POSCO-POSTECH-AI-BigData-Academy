@@ -31,6 +31,7 @@ class binpacking_posco_v0(gym.Env):
         # threshold 몇 %의 맵을 채웠을때 추가점수를 줄 것인가. : / 0.6 (float)
         mapsize : 전체 맵 사이즈 / [10, 10] (list)
         print_Map : Action시 마다 Map 출력 / True (bool)
+        rendering : False / (bool)
         """
         super(binpacking_posco_v0, self).__init__()
         # Params
@@ -132,11 +133,10 @@ class binpacking_posco_v0(gym.Env):
         
         return np.array(self.state)
 
-    def render(self, action, reward, mode='human'):
-        if mode == 'human':
-            print (f'Action :{action}, reward :{reward}, box :{self.width, self.length}')
-            if self.print_Map:
-                print (self.Map)
+    def render(self, action, mode='human'):
+        print (f'Action :{action}, box :{self.width, self.length}')
+        if self.print_Map:
+            print (self.Map)
     
     def close(self):
         pass

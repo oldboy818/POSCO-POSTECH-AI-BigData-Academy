@@ -9,7 +9,8 @@ class binpacking_posco_v1(binpacking_posco_v0):
     products = [(3,3), (3,3), (3,3), (1,1), (1,1), (1,1),
                 (3,3), (3,3), (3,3), (1,1), (1,1), (1,1),
                 (2,2), (2,2), (2,2), (2,2), (2,2),
-                (2,2), (2,2), (2,2), (2,2), (2,2)]
+                (2,2), (2,2), (2,2), (2,2), (2,2), (10,10)]
+    # 마지막은 종료용 Empty
     """
     version 1
     
@@ -36,6 +37,7 @@ class binpacking_posco_v1(binpacking_posco_v0):
         terminated = bool(
             self.ct2 == self.ct2_threshold
             or self.filled_map > 80 # 80% 이상
+            or self.prod_idx == 22
         )
         score = 0
         if not terminated:
