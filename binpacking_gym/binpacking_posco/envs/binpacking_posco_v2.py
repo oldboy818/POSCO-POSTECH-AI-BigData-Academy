@@ -45,5 +45,8 @@ class binpacking_posco_v2(binpacking_posco_v1):
             else:
                 reward = -1
         info = {'score' : score}
+
+        if self.render_mode == "human":
+            self._render_frame()
         
         return self.state, reward, terminated, info

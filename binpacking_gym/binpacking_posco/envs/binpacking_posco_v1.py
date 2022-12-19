@@ -9,7 +9,7 @@ class binpacking_posco_v1(binpacking_posco_v0):
     products = [(3,3), (3,3), (3,3), (1,1), (1,1), (1,1),
                 (3,3), (3,3), (3,3), (1,1), (1,1), (1,1),
                 (2,2), (2,2), (2,2), (2,2), (2,2),
-                (2,2), (2,2), (2,2), (2,2), (2,2)]
+                (2,2), (2,2), (2,2), (2,2), (2,2), (10,10)]
     """
     version 1
     
@@ -35,7 +35,8 @@ class binpacking_posco_v1(binpacking_posco_v0):
         
         terminated = bool(
             self.ct2 == self.ct2_threshold
-            or self.filled_map > 80 # 80% 이상
+            or self.filled_map >= 100 # 80% 이상
+            or self.prod_idx == 22
         )
         score = 0
         if not terminated:
@@ -43,13 +44,16 @@ class binpacking_posco_v1(binpacking_posco_v0):
                 self.map_action(action)
                 self.update_product()
                 self.state = np.append(self.Map.flatten(), self.width)
-                reward = 1
+                reward = self.width * self.length
                 self.ct2 = 0
             else:
-                reward = -1
+                reward = 0
         else:
-            reward = -1
+            reward = 0
         info = {'score' : score}
+
+        if self.render_mode == "human":
+            self._render_frame()
         
         return self.state, reward, terminated, info
     
@@ -66,5 +70,9 @@ class binpacking_posco_v1(binpacking_posco_v0):
         
         # Map of warehouse
         self.Map = np.zeros(self.mapsize, dtype=int)
+
+        # Rendering
+        if self.render_mode == "human":
+            self._render_frame()
         
         return np.array(self.state)
