@@ -190,7 +190,7 @@ class binpacking_posco_v0(gym.Env):
                     # pygame.time.delay(100) # delay주면 한 episode가 너무 오래걸림
 
         font = pygame.font.SysFont("arial", 30, True, False)
-        text = font.render(f"score : {self.filled_map}", True, (255,0,0))
+        text = font.render(f"score : {np.sum(self.Map)}", True, (255,0,0))
         canvas.blit(text, (130,200))
         pygame.display.update()
         pygame.display.flip()
