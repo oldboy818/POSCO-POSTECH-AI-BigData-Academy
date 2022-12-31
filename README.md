@@ -5,7 +5,7 @@ To organize products in warehouses.
 we performed reinforcement learning.  
 
 > Input   : Products of differents sizes.  
-> Purpose : Minimum Space.
+> Purpose : Minimum Space.  
 > Model   : Reinforcement Learning / PPO (Proximal Policy Optimization.
 
 ![Before]('./docs/v4_before.gif')
