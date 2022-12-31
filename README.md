@@ -4,6 +4,7 @@ From 2022-12-06
 To organize products in warehouses.  
 we performed reinforcement learning.  
 
+|-|-|
 |---|---|
 |Input|---|
 |Purpose|Minimum Space|
