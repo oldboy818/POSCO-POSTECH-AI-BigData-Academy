@@ -10,7 +10,7 @@ we performed reinforcement learning.
 |Purpose|Minimum Space|
 |Model|Reinforcement Learning / PPO (proximal policy optimization)|
 
-![Before]('./docs/v4_before.gif')
+![v4_before](https://user-images.githubusercontent.com/67701541/210139433-2c97f972-e08c-423f-9831-8c7d48c0216e.gif)
 ![Before]('./docs/v4_before.gif')
 
 ## Gym Env
