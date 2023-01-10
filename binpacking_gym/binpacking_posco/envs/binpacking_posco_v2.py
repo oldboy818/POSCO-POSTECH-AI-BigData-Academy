@@ -7,14 +7,10 @@ from binpacking_posco_v1 import binpacking_posco_v1
 class binpacking_posco_v2(binpacking_posco_v1):
     """
     Version 2
-    V0 의 모든 함수를 따라감.
-    
-    input product를 랜덤으로 선별하도록. -> 고정해 놓으니까 Local minimum에 빠지는 듯 함.
-    그리고 일정 조건을 넘었을 때 종료 되도록.
-    
-    현재 들고있는 물건 부피까지해서 전체 맵의 특정 % 이상 점유할 때 종료.
-    
-    => 우선 물리적으로 가능한 동작만 하게 학습하려고 Reward를 수정함.
+    v1의 모든 함수를 따라감 (Product 순서 정해짐)
+
+    threshold 비율 만큼 물건을 채웠을 때 추가 점수
+    -> Masking 적용 안됨.
     """
     
     def __init__(self, **kwargs):
