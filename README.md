@@ -35,4 +35,4 @@ env = gym.make('binpacking_posco-v0')
 
 ## Model
 
-DQN model constructed by [Stable-baselines3]()
+DQN or PPO model constructed by [Stable-baselines3](https://stable-baselines3.readthedocs.io/en/master/)
